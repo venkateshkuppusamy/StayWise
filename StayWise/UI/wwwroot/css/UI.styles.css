@@ -1,0 +1,33 @@
+/* Blue background for the body */
+.blue-background {
+    background-color: #e6f7ff; /* Light blue */
+    color: #000; /* Black text for contrast */
+}
+
+/* Silver header */
+.silver-header {
+    background-color: #c0c0c0; /* Silver */
+    color: #000; /* Black text */
+    padding: 20px 0;
+}
+
+/* Silver navbar */
+.silver-navbar {
+    background-color: #c0c0c0; /* Silver */
+    color: #000; /* Black text */
+}
+
+/* Silver footer */
+.silver-footer {
+    background-color: #c0c0c0; /* Silver */
+    color: #000; /* Black text */
+    padding: 10px 0;
+}
+
+/* Site title styling */
+.site-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: #004080; /* Dark blue */
+}

@@ -1,0 +1,154 @@
+@page "/hotels"
+@using BlazorAppUI.Services
+@using BlazorAppUI.Shared
+@using BlazorAppUI.Models
+@inject HotelService HotelService
+
+<h3>Hotels</h3>
+
+<ConfirmationDialog @ref="confirmationDialog" Title="Save Confirmation" Message="Are you sure you want to save this hotel?" OnClose="HandleConfirmation" />
+<ValidationSummaryDialog @ref="validationDialog" EditContext="editContext" />
+
+@if (hotels == null)
+{
+    <p>Loading hotels...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Rating</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hotel in hotels)
+            {
+                <tr>
+                    <td>@hotel.Name</td>
+                    <td>@hotel.Location</td>
+                    <td>@hotel.Rating</td>
+                    <td>@hotel.PhoneNo</td>
+                    <td>@hotel.Email</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => EditHotel(hotel)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteHotel(hotel.HotelId)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>@(isEditing ? "Edit Hotel" : "Create Hotel")</h4>
+    <EditForm OnValidSubmit="ShowSaveConfirmation" OnInvalidSubmit="ShowValidationErrors" style="max-width: 66%;" EditContext="editContext">
+        <Blazored.FluentValidation.FluentValidationValidator />
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <InputText id="name" class="form-control" @bind-Value="currentHotel.Name" />
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <InputText id="location" class="form-control" @bind-Value="currentHotel.Location" />
+        </div>
+        <div class="mb-3">
+            <label for="rating" class="form-label">Rating</label>
+            <InputNumber id="rating" class="form-control" @bind-Value="currentHotel.Rating" />
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <InputText id="phone" class="form-control" @bind-Value="currentHotel.PhoneNo" />
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <InputText id="email" class="form-control" @bind-Value="currentHotel.Email" />
+        </div>
+        <button type="submit" class="btn btn-success">@((isEditing ? "Update" : "Create"))</button>
+        <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    private List<Hotel>? hotels;
+    private Hotel currentHotel = new();
+    private bool isEditing = false;
+    private ConfirmationDialog? confirmationDialog;
+    private ValidationSummaryDialog? validationDialog;
+    private EditContext? editContext;
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(currentHotel);
+        await LoadHotels();
+    }
+
+    private async Task LoadHotels()
+    {
+        hotels = await HotelService.GetHotelsAsync();
+    }
+
+    private void EditHotel(Hotel hotel)
+    {
+        currentHotel = new Hotel
+        {
+            HotelId = hotel.HotelId,
+            Name = hotel.Name,
+            Location = hotel.Location,
+            Rating = hotel.Rating,
+            PhoneNo = hotel.PhoneNo,
+            Email = hotel.Email
+        };
+        editContext = new EditContext(currentHotel);
+        isEditing = true;
+    }
+
+    private void ShowSaveConfirmation()
+    {
+        confirmationDialog?.Show();
+    }
+
+    private void ShowValidationErrors()
+    {
+        validationDialog?.Show();
+    }
+
+    private async Task HandleConfirmation(bool confirmed)
+    {
+        if (confirmed)
+        {
+            await SaveHotel();
+        }
+    }
+
+    private async Task SaveHotel()
+    {
+        if (isEditing)
+        {
+            await HotelService.UpdateHotelAsync(currentHotel);
+        }
+        else
+        {
+            await HotelService.CreateHotelAsync(currentHotel);
+        }
+
+        await LoadHotels();
+        CancelEdit();
+    }
+
+    private async Task DeleteHotel(int hotelId)
+    {
+        await HotelService.DeleteHotelAsync(hotelId);
+        await LoadHotels();
+    }
+
+    private void CancelEdit()
+    {
+        currentHotel = new Hotel();
+        editContext = new EditContext(currentHotel);
+        isEditing = false;
+    }
+}

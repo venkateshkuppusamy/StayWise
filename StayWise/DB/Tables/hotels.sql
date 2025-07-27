@@ -1,0 +1,13 @@
+CREATE TABLE dbo.hotels
+(
+    HotelId INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Location NVARCHAR(200) NULL,
+    Rating DECIMAL(3, 2) NULL,
+    PhoneNo NVARCHAR(15) NULL,
+    Email NVARCHAR(100) NULL,
+    CreatedBy NVARCHAR(50) NULL,
+    UpdatedBy NVARCHAR(50) NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedAt DATETIME NULL
+);

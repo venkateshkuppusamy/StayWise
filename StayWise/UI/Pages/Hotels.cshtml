@@ -1,0 +1,68 @@
+@page
+@model HotelsModel
+@{
+    ViewData["Title"] = "Hotels";
+}
+
+<div class="container">
+    <h2>Hotels</h2>
+    <p>Manage your hotels below.</p>
+
+    <!-- Add/Edit Hotel Form -->
+    <form method="post">
+        <input type="hidden" asp-for="Hotel.HotelId" />
+        <div class="mb-3">
+            <label asp-for="Hotel.Name" class="form-label">Hotel Name</label>
+            <input asp-for="Hotel.Name" class="form-control" />
+            <span asp-validation-for="Hotel.Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Hotel.Location" class="form-label">Location</label>
+            <input asp-for="Hotel.Location" class="form-control" />
+            <span asp-validation-for="Hotel.Location" class="text-danger"></span>
+        </div>
+        <button type="submit" asp-page-handler="@((Model.Hotel.HotelId == 0) ? "Save" : "Edit")" class="btn btn-primary">
+            Save
+        </button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
+    </form>
+
+    <hr />
+
+    <!-- List of Hotels -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Hotel Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hotel in Model.Hotels)
+            {
+                <tr>
+                    <td>@hotel.Name</td>
+                    <td>@hotel.Location</td>
+                    <td>
+                        <!-- Edit Button -->
+                        <button type="button" class="btn btn-warning btn-sm" 
+                                onclick="populateForm(@hotel.HotelId, '@hotel.Name', '@hotel.Location')">
+                            Edit
+                        </button>
+
+                        <!-- Delete Button -->
+                        <form method="post" asp-page-handler="Delete">
+                            <input type="hidden" name="id" value="@hotel.HotelId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
